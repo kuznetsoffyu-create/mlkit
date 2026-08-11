@@ -47,6 +47,16 @@ class ChooserActivity :
 			Toast.makeText(this, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
 		}
 	}
+	
+	// Проверяем, есть ли разрешение на камеру
+	if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+		// Если нет - запрашиваем у пользователя камеру и доступ к файлам
+		androidx.core.app.ActivityCompat.requestPermissions(
+			this, 
+			arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 
+			1
+		)
+	}
 
     // Set up ListView and Adapter
     val listView = findViewById<ListView>(R.id.test_activity_list_view)
