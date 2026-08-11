@@ -92,3 +92,7 @@ ML Kit поддерживает загрузку любых моделей в ф
 Сотни готовых моделей с платформ вроде Kaggle Models (бывший TensorFlow Hub) или Hugging Face.
 Модели, обученные вами лично (например, через сервисы Google Cloud AutoML, Teachable Machine или написанные с нуля на Python).
 Например, можно подключить модель, которая будет распознавать конкретные марки машин, дефекты на трубах, типы болезней растений по листьям и т.д.
+
+	---
+	
+	https://developers.google.com/ml-kit/vision/subject-segmentation/android?hl=ru

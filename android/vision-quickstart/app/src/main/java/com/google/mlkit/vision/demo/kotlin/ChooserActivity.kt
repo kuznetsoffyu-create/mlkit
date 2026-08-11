@@ -36,8 +36,9 @@ class ChooserActivity :
     setContentView(R.layout.activity_chooser)
 	
 		
-	//	debug test:
-	fun testHardwareDelegates() {
+	/*	debug test:
+	fun testHardwareDelegates()
+	{
 		val tag = "HardwareTest"
 		
 		// Тест 1: Пытаемся запустить NNAPI (NPU / DSP)
@@ -78,12 +79,12 @@ class ChooserActivity :
 		} catch (e: Throwable) {
 			Log.e(tag, "❌ Неизвестная критическая ошибка GPU: ${e.message}")
 		}
-	}
+	} */
 
 	//	Logs Btn:
 	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
 		try {
-			testHardwareDelegates()
+			//testHardwareDelegates()
 			
 			// Получаем логи
 			val logs = Runtime.getRuntime().exec("logcat -d -t 1000").inputStream.bufferedReader().readText()
