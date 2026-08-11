@@ -19,6 +19,17 @@ android {
         vectorDrawables.useSupportLibrary = true
         setProperty("archivesBaseName", "vision-quickstart")
     }
+	
+	// конфигурацию подписи
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+	
     buildTypes {
         proguard {
             debuggable false
@@ -34,6 +45,8 @@ android {
             isDefault true
             minifyEnabled false
             proguardFiles 'proguard-rules.pro'
+			// Привязываем нашу подпись к debug-сборке
+            signingConfig signingConfigs.debug
         }
         testBuildType "debug"
     }
