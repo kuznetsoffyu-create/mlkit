@@ -76,6 +76,7 @@ Instrumented test — androidTest, запускаемый через ./gradlew c
 	
 	Custom Models
 Unbundled (Отвязанная): Модель не включается в APK. Вместо этого приложение просит системный сервис (Google Play Services) скачать эту модель в фоне. Плюс: ваш APK весит копейки.
+SEE:	mlkit\android\vision-quickstart\app\build.gradle
 
 ML Kit поддерживает загрузку любых моделей в формате .tflite (TensorFlow Lite), если они предназначены для классификации изображений или поиска объектов (Object Detection).
 В самом проекте vision-quickstart есть примеры работы с пользовательскими моделями (обычно там лежат простенькие модели классификации птиц или цветов).
