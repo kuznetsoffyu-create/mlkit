@@ -24,8 +24,8 @@ import java.io.File
 import android.widget.Button
 import android.widget.Toast
 
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.nnapi.NnApiDelegate
+//import org.tensorflow.lite.Interpreter
+//import org.tensorflow.lite.nnapi.NnApiDelegate
 
 /** Demo app chooser which allows you pick from all available testing Activities. */
 class ChooserActivity :
