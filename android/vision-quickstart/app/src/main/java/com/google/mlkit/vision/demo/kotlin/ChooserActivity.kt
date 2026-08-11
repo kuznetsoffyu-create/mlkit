@@ -18,10 +18,14 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.google.mlkit.vision.demo.R
+
 import android.os.Environment
 import java.io.File
 import android.widget.Button
 import android.widget.Toast
+
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.nnapi.NnApiDelegate
 
 /** Demo app chooser which allows you pick from all available testing Activities. */
 class ChooserActivity :
@@ -58,6 +62,45 @@ class ChooserActivity :
 			arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 
 			1
 		)
+	}
+	
+	//	debug test:
+	fun testHardwareDelegates() {
+		val tag = "HardwareTest"
+		
+		// Тест 1: Пытаемся запустить NNAPI (NPU / DSP)
+		try {
+			Log.i(tag, "Попытка инициализации NNAPI Delegate...")
+			val nnApiOptions = NnApiDelegate.Options()
+			nnApiOptions.executionPreference = NnApiDelegate.Options.EXECUTION_PREFERENCE_SUSTAINED_SPEED
+			val nnApiDelegate = NnApiDelegate(nnApiOptions)
+			
+			// Если код дошел сюда, значит делегат создался!
+			Log.i(tag, "✅ УРА! NNAPI Delegate успешно создан. Ваш NPU MediaTek готов к работе!")
+			Toast.makeText(this, "✅ УРА! NNAPI Delegate успешно создан. Ваш NPU MediaTek готов к работе!", Toast.LENGTH_SHORT).show()
+			
+			// Как это использовать в TFLite:
+			// val options = Interpreter.Options().addDelegate(nnApiDelegate)
+			// val interpreter = Interpreter(modelBuffer, options)
+			
+		} catch (e: Exception) {
+			Log.e(tag, "❌ Ошибка создания NNAPI Delegate: ${e.message}")
+			Toast.makeText(this, "❌ Ошибка создания NNAPI Delegate: ${e.message}", Toast.LENGTH_LONG).show()
+		} catch (e: Error) {
+			Toast.makeText(this, "❌ Критическая ошибка (вероятно нет библиотек): ${e.message}", Toast.LENGTH_LONG).show()
+			Log.e(tag, "❌ Критическая ошибка (вероятно нет библиотек): ${e.message}")
+		}
+
+		// Тест 2: Можно аналогично проверить GPU
+		try {
+			Log.i(tag, "Попытка инициализации GPU Delegate...")
+			val gpuDelegate = org.tensorflow.lite.gpu.GpuDelegate()
+			Log.i(tag, "✅ GPU Delegate успешно создан!")
+			Toast.makeText(this, "✅ GPU Delegate успешно создан!", Toast.LENGTH_SHORT).show()
+		} catch (e: Exception) {
+			Log.e(tag, "❌ GPU Delegate не поддерживается: ${e.message}")
+			Toast.makeText(this, "❌ GPU Delegate не поддерживается: ${e.message}", Toast.LENGTH_LONG).show()
+		}
 	}
 
     // Set up ListView and Adapter
