@@ -20,6 +20,8 @@ import androidx.core.app.ActivityCompat
 import com.google.mlkit.vision.demo.R
 import android.os.Environment
 import java.io.File
+import android.widget.Button
+import android.widget.Toast
 
 /** Demo app chooser which allows you pick from all available testing Activities. */
 class ChooserActivity :
