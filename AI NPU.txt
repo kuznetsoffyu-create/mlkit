@@ -1,0 +1,85 @@
+15T Pro — MediaTek Dimensity 9400+ с NPU 890
+
+	---
+	
+AICore - Его единственная задача — управлять моделью Gemini Nano: скачивать и обновлять её, направлять инференс на NPU/TPU в зависимости от железа, и следить за приватностью через Private Compute Core. узкоспециализированный слой конкретно для Gemini Nano и GenAI-фич (Smart Reply, суммаризация, magic eraser и т.п.)
+
+ML Kit GenAI APIs, построенные поверх AICore, поддерживают шесть возможностей: Summarization (суммаризация статей/переписок в буллеты), Proofreading (исправление грамматики и опечаток), Rewriting (переписывание коротких сообщений в разных тонах), Image description (короткое описание изображения), Speech recognition (транскрипция аудио в текст) и Prompt (свободный текстовый или мультимодальный промпт).
+@
+Prompt API (свободные текстовые и мультимодальные запросы, структурированный вывод, системные инструкции) — поддерживается, но на уровне модели nano-v2
+@
+RAG на устройстве. Соедините Nano с встроенными в устройство данными из Google AI Edge SDK, извлекайте фрагменты из локальной базы знаний и используйте их для получения обоснованных ответов. Весь цикл остается на телефоне.
+
+Эти API официально не работают на устройствах с разблокированным бутлоадером
+
+Инференс разрешён только когда приложение на переднем плане, действует квота на количество запросов в единицу времени (ErrorCode.BUSY) и на общую нагрузку (PER_APP_BATTERY_USE_QUOTA_EXCEEDED). 
+
+	---
+	
+MediaTek NeuroPilot — их собственный софтверный слой для доступа к NPU, который недавно интегрировали в LiteRT под именем LiteRT NeuroPilot Accelerator
+
+	---
+	
+adb shell (без root, нужен ПК с включённой USB-отладкой):
+Это даёт реальную проверку NNAPI-инференса на этом железе. Официальный инструмент — benchmark_model из LiteRT, чистый нативный бинарник, никакого APK не требует:
+
+bash
+adb push benchmark_model /data/local/tmp/
+adb push model.tflite /data/local/tmp/
+adb shell /data/local/tmp/benchmark_model \
+  --graph=/data/local/tmp/model.tflite \
+  --use_nnapi=true
+
+Инструмент поддерживает флаги для подбора оптимальной конфигурации делегата, включая --use_gpu=true для проверки GPU-исполнения. NNAPI официально deprecated начиная с Android 15, с рекомендацией мигрировать на TensorFlow Lite in Play Services и AICore, но HAL-слой пока жив и на MediaTek обычно маршрутизирует на их NPU HAL — так что это рабочий способ быстро проверить "долетает ли модель до NPU" без написания приложения. 
+
+	---
+
+настоящий NeuroPilot / production-путь:
+Здесь shell/Termux уже не подходит в принципе — LiteRT NeuroPilot Accelerator и Gemini Nano/AICore экспонируются только через Android app framework (Kotlin/Java + NDK внутри APK). Не обязательно публиковать приложение — достаточно debug-сборки через ./gradlew installDebug, — но это уже не терминальный сценарий.
+
+собственными AI-фичами Xiaomi HyperAI (типа AI-редактирования фото), которые могут идти напрямую через MediaTek NeuroPilot, минуя AICore/ML Kit целиком — у них нет публичного API для сторонних разработчиков.
+
+	---
+	
+(+) https://www.forasoft.com/blog/article/neural-networks-on-android-369
+
+	Android 2026 on-device AI stack
+	
+	App-level APIs:
+ML Kit GenAI APIs, MediaPipe Tasks, Prompt API, Google AI Edge SDK
+Mature; start here before touching a raw interpreter
+
+	Runtimes
+LiteRT 2.x (CompiledModel), LiteRT-LM, ONNX Runtime Mobile, ExecuTorch 1.x
+LiteRT is the Android default; ExecuTorch now stable
+
+	Accelerators
+Hexagon NPU, Tensor TPU, Adreno/Mali GPU, ARM CPU
+NPU on flagships; GPU on mid-range; CPU as the floor
+
+	Model formats + quant
+.tflite, .onnx; FP16 / INT8 / INT4 (INT2 / FP8 on newest NPUs)
+Stable; INT8 default for vision, INT4 for LLMs
+
+	---
+	
+	https://github.com/kuznetsoffyu-create/mlkit/
+	
+"Headless" Android-инстансация через adb — из :app собрать Activity, которая берёт путь к картинке из intent-extra, гоняет через нужный процессор (SegmenterProcessor и т.п.) и пишет результат в logcat/файл. Запуск: adb shell am start -n com.google.mlkit.vision.demo/.MainActivity --es image_path /sdcard/test.jpg. Всё равно нужен эмулятор/устройство, но без открытия UI руками.
+скорее всего нужен включенный USB-debugging / Xiaomi HyperOS/MIUI иногда требует отдельно включить "USB debugging (Security settings)" в Developer Options (не путать с обычным USB debugging)
+
+Instrumented test — androidTest, запускаемый через ./gradlew connectedAndroidTest, тоже требует эмулятор, но полностью скриптуется из CI.
+
+Мимо ML Kit, напрямую через TFLite — если конкретная модель (например selfie segmentation) существует как обычный .tflite-файл, можно прогнать её через tflite-runtime/LiteRT без Android вообще, чистым Python/CLI-бинарником — но это уже не ML Kit API, а его модель напрямую, с другой оберткой и, возможно, другим форматом входа/выхода.
+
+	---
+	
+	Custom Models
+Unbundled (Отвязанная): Модель не включается в APK. Вместо этого приложение просит системный сервис (Google Play Services) скачать эту модель в фоне. Плюс: ваш APK весит копейки.
+
+ML Kit поддерживает загрузку любых моделей в формате .tflite (TensorFlow Lite), если они предназначены для классификации изображений или поиска объектов (Object Detection).
+В самом проекте vision-quickstart есть примеры работы с пользовательскими моделями (обычно там лежат простенькие модели классификации птиц или цветов).
+Что вы можете туда загрузить:
+Сотни готовых моделей с платформ вроде Kaggle Models (бывший TensorFlow Hub) или Hugging Face.
+Модели, обученные вами лично (например, через сервисы Google Cloud AutoML, Teachable Machine или написанные с нуля на Python).
+Например, можно подключить модель, которая будет распознавать конкретные марки машин, дефекты на трубах, типы болезней растений по листьям и т.д.
