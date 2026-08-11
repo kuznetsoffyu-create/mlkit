@@ -2,7 +2,7 @@ name: Build vision-quickstart APK
 
 on:
   push:
-    branches: [ master ]   # проверьте, что ветка форка называется именно так
+    branches: [ main ]   # проверьте, что ветка форка называется именно так
   workflow_dispatch:        # позволяет запускать вручную из вкладки Actions
 
 jobs:
