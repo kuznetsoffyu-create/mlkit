@@ -20,6 +20,16 @@ android {
         setProperty("archivesBaseName", "vision-quickstart")
     }
 	
+	// сплит по ABI, чтобы не паковать нативные .so-библиотеки TFLite под x86/x86_64, которые вам на реальном телефоне не нужны:
+	splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a'
+            universalApk false
+        }
+    }
+	
 	// конфигурацию подписи
     signingConfigs {
         debug {
