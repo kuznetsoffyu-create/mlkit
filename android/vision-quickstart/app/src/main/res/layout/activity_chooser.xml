@@ -9,6 +9,12 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:orientation="vertical">
 
+	<Button
+		android:id="@+id/btn_show_logs"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Logs" />
+		
   <ImageView
       android:id="@+id/imageView"
       android:contentDescription="@string/app_name"
@@ -32,4 +38,5 @@
       android:id="@+id/test_activity_list_view"
       android:layout_width="match_parent"
       android:layout_height="match_parent"/>
+	  
 </LinearLayout>

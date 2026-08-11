@@ -1,18 +1,3 @@
-/*
- * Copyright 2020 Google LLC. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.google.mlkit.vision.demo.kotlin
 
@@ -33,6 +18,8 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.google.mlkit.vision.demo.R
+import android.os.Environment
+import java.io.File
 
 /** Demo app chooser which allows you pick from all available testing Activities. */
 class ChooserActivity :
@@ -41,6 +28,25 @@ class ChooserActivity :
     super.onCreate(savedInstanceState)
     Log.d(TAG, "onCreate")
     setContentView(R.layout.activity_chooser)
+	
+	//	Logs Btn:
+	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
+		try {
+			// Получаем логи
+			val logs = Runtime.getRuntime().exec("logcat -d -t 1000").inputStream.bufferedReader().readText()
+			
+			// Создаем файл в общедоступной папке "Загрузки"
+			val downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+			val logFile = File(downloadsFolder, "mlkit_logs.txt")
+			
+			// Записываем логи в файл
+			logFile.writeText(logs)
+			
+			Toast.makeText(this, "Логи сохранены в Загрузки!", Toast.LENGTH_SHORT).show()
+		} catch (e: Exception) {
+			Toast.makeText(this, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
+		}
+	}
 
     // Set up ListView and Adapter
     val listView = findViewById<ListView>(R.id.test_activity_list_view)
