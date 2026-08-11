@@ -22,6 +22,12 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+        
+      # debug.keystore   base64 to bin
+      - name: Decode Base64 Keystore
+        run: |
+          base64 --decode app/debug.keystore > app/debug_binary.keystore
+          mv app/debug_binary.keystore app/debug.keystore
 
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon

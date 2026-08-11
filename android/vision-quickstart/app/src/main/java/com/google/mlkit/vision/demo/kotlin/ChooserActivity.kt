@@ -70,8 +70,13 @@ class ChooserActivity :
 			Log.i(tag, "✅ GPU Delegate успешно создан!")
 			Toast.makeText(this, "✅ GPU Delegate успешно создан!", Toast.LENGTH_SHORT).show()
 		} catch (e: Exception) {
-			Log.e(tag, "❌ GPU Delegate не поддерживается: ${e.message}")
-			Toast.makeText(this, "❌ GPU Delegate не поддерживается: ${e.message}", Toast.LENGTH_LONG).show()
+			Log.e(tag, "❌ GPU Delegate ошибка: ${e.message}")
+			Toast.makeText(this, "❌ GPU Delegate ошибка: ${e.message}", Toast.LENGTH_LONG).show()
+		} catch (e: Error) { // <- Добавлен перехват LinkageError / NoClassDefFoundError
+			Log.e(tag, "❌ Отсутствует библиотека GPU Delegate: ${e.message}")
+			Toast.makeText(this, "❌ GPU Delegate не установлен (нет библиотеки)", Toast.LENGTH_LONG).show()
+		} catch (e: Throwable) {
+			Log.e(tag, "❌ Неизвестная критическая ошибка GPU: ${e.message}")
 		}
 	}
 
