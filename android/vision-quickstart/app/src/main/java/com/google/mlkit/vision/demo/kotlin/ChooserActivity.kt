@@ -35,35 +35,7 @@ class ChooserActivity :
     Log.d(TAG, "onCreate")
     setContentView(R.layout.activity_chooser)
 	
-	//	Logs Btn:
-	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
-		try {
-			// Получаем логи
-			val logs = Runtime.getRuntime().exec("logcat -d -t 1000").inputStream.bufferedReader().readText()
-			
-			// Создаем файл в общедоступной папке "Загрузки"
-			val downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-			val logFile = File(downloadsFolder, "mlkit_logs.txt")
-			
-			// Записываем логи в файл
-			logFile.writeText(logs)
-			
-			Toast.makeText(this, "Логи сохранены в Загрузки!", Toast.LENGTH_SHORT).show()
-		} catch (e: Exception) {
-			Toast.makeText(this, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
-		}
-	}
-	
-	// Проверяем, есть ли разрешение на камеру
-	if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-		// Если нет - запрашиваем у пользователя камеру и доступ к файлам
-		androidx.core.app.ActivityCompat.requestPermissions(
-			this, 
-			arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 
-			1
-		)
-	}
-	
+		
 	//	debug test:
 	fun testHardwareDelegates() {
 		val tag = "HardwareTest"
@@ -101,6 +73,37 @@ class ChooserActivity :
 			Log.e(tag, "❌ GPU Delegate не поддерживается: ${e.message}")
 			Toast.makeText(this, "❌ GPU Delegate не поддерживается: ${e.message}", Toast.LENGTH_LONG).show()
 		}
+	}
+
+	//	Logs Btn:
+	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
+		try {
+			testHardwareDelegates()
+			
+			// Получаем логи
+			val logs = Runtime.getRuntime().exec("logcat -d -t 1000").inputStream.bufferedReader().readText()
+			
+			// Создаем файл в общедоступной папке "Загрузки"
+			val downloadsFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+			val logFile = File(downloadsFolder, "mlkit_logs.txt")
+			
+			// Записываем логи в файл
+			logFile.writeText(logs)
+			
+			Toast.makeText(this, "Логи сохранены в Загрузки!", Toast.LENGTH_SHORT).show()
+		} catch (e: Exception) {
+			Toast.makeText(this, "Ошибка: ${e.message}", Toast.LENGTH_LONG).show()
+		}
+	}
+	
+	// Проверяем, есть ли разрешение на камеру
+	if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+		// Если нет - запрашиваем у пользователя камеру и доступ к файлам
+		androidx.core.app.ActivityCompat.requestPermissions(
+			this, 
+			arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 
+			1
+		)
 	}
 
     // Set up ListView and Adapter
