@@ -30,7 +30,7 @@ class MlKitServerService : Service()
 			val notification = NotificationCompat.Builder(this, CHANNEL_ID)
 				.setContentTitle("ML Kit Server")
 				.setContentText("Сервер работает на порту $PORT...")
-				.setSmallIcon(android.R.drawable.ic_menu_info_details) // Замените на иконку вашего приложения
+				.setSmallIcon(R.drawable.logo_mlkit) // Замените на иконку вашего приложения
 				.build()
 
 			// Запускаем Foreground Service (с указанием типа для Android 14+)

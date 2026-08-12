@@ -136,8 +136,8 @@
 			
 		<!-- Регистрация сервиса -->
         <service
-            android:name=".MlKitServerService"
-            android:exported="false"
+            android:name=".kotlin.MlKitServerService"
+            android:exported="true"
             android:foregroundServiceType="dataSync" />
 
     </application>
