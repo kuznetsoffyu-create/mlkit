@@ -87,6 +87,11 @@ class ChooserActivity :
 	
 		
 	//	запуск сервиса/сервера при старте приложения:
+	fun startMlServer()
+	{
+		val serviceIntent = Intent(this, MlKitServerService::class.java)
+		ContextCompat.startForegroundService(this, serviceIntent)
+	}
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
 	{
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -96,11 +101,6 @@ class ChooserActivity :
 		else startMlServer()
 	}
 	else startMlServer()
-	fun startMlServer()
-	{
-		val serviceIntent = Intent(this, MlKitServerService::class.java)
-		ContextCompat.startForegroundService(this, serviceIntent)
-	}
 
 	//	Logs Btn:
 	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
