@@ -1,6 +1,6 @@
 package com.google.mlkit.vision.demo.kotlin
 
-import com.google.mlkit.vision.demo.R
+import com.google.mlkit.vision.demo.R	// импорт ресурсов
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,6 +17,9 @@ class MlKitServerService : Service()
     private var server: MlServer? = null
     private val PORT = 8000 // Порт, на котором будет работать сервер
     private val CHANNEL_ID = "MlKitServerChannel"
+	
+	// Константа для распознавания нажатия на кнопку "Остановить"
+    companion object { const val ACTION_STOP_SERVER = "ACTION_STOP_SERVER" }
 
     override fun onCreate() {
         super.onCreate()
@@ -25,7 +28,20 @@ class MlKitServerService : Service()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
 	{
-		Log.d("ML_SERVER_DEBUG", "Run Foreground Service...")
+		// Проверяем, пришла ли команда на остановку от кнопки
+        if (intent?.action == ACTION_STOP_SERVER)
+		{
+            Log.d("ML_SERVER_DEBUG", "Получена команда на остановку сервера.")
+            stopServerAndService()
+            return START_NOT_STICKY // Не перезапускать сервис после остановки
+        }
+		// Intent для кнопки "Остановить"
+        val stopIntent = Intent(this, MlKitServerService::class.java).apply {
+            action = ACTION_STOP_SERVER
+        }
+		// Оборачиваем его в PendingIntent (флаг IMMUTABLE обязателен для Android 12+)
+        val stopPendingIntent = PendingIntent.getService(
+            this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT )
 		
 		try {
 			// Создаем уведомление, чтобы система не убила сервис
@@ -33,6 +49,12 @@ class MlKitServerService : Service()
 				.setContentTitle("ML Kit Server")
 				.setContentText("Сервер работает на порту $PORT...")
 				.setSmallIcon(R.drawable.logo_mlkit) // Замените на иконку вашего приложения
+				// кнопка останова сервера:
+				.addAction(
+					android.R.drawable.ic_menu_close_clear_cancel, // Стандартная иконка крестика
+					"Stop", // Текст на кнопке
+					stopPendingIntent // Действие
+				)
 				.build()
 
 			// Запускаем Foreground Service (с указанием типа для Android 14+)
@@ -53,6 +75,26 @@ class MlKitServerService : Service()
 		}
 
         return START_STICKY // Перезапустить сервис, если система его убьет
+    }
+	
+	// чистая остановка NanoHTTPD+Foreground
+    private fun stopServerAndService()
+	{
+        // 1. Останавливаем NanoHTTPD
+        server?.stop()
+        server = null
+        Log.d("ML_SERVER_DEBUG", "NanoHTTPD остановлен.")
+
+        // 2. Убираем сервис из Foreground (уведомление исчезнет)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+
+        // 3. Полностью уничтожаем сервис
+        stopSelf()
     }
 
     override fun onDestroy() {
