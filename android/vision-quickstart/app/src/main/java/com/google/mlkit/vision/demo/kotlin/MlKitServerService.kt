@@ -1,5 +1,7 @@
 package com.google.mlkit.vision.demo.kotlin
 
+import com.google.mlkit.vision.demo.R
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
