@@ -24,6 +24,8 @@ import java.io.File
 import android.widget.Button
 import android.widget.Toast
 
+import androidx.core.content.ContextCompat
+
 //import org.tensorflow.lite.Interpreter
 //import org.tensorflow.lite.nnapi.NnApiDelegate
 
@@ -35,6 +37,9 @@ class ChooserActivity :
     Log.d(TAG, "onCreate")
     setContentView(R.layout.activity_chooser)
 	
+	//	запуск сервиса при старте приложения
+	val serviceIntent = Intent(this, MlKitServerService::class.java)
+	ContextCompat.startForegroundService(this, serviceIntent)
 		
 	/*	debug test:
 	fun testHardwareDelegates()

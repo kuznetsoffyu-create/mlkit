@@ -17,10 +17,17 @@
 
     <uses-feature android:name="android.hardware.camera"/>
 
+		<!-- Разрешения -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Для Android 14 (API 34+) обязательно указывать тип Foreground Service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Для Android 13+ (API 33+) для показа уведомления сервиса -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name="androidx.multidex.MultiDexApplication"
@@ -126,6 +133,12 @@
         <activity
             android:name=".preference.SettingsActivity"
             android:exported="false"/>
+			
+		<!-- Регистрация сервиса -->
+        <service
+            android:name=".MlKitServerService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
     </application>
     <queries>
