@@ -24,6 +24,9 @@ import java.io.File
 import android.widget.Button
 import android.widget.Toast
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 
 //import org.tensorflow.lite.Interpreter
@@ -36,11 +39,7 @@ class ChooserActivity :
     super.onCreate(savedInstanceState)
     Log.d(TAG, "onCreate")
     setContentView(R.layout.activity_chooser)
-	
-	//	запуск сервиса при старте приложения
-	val serviceIntent = Intent(this, MlKitServerService::class.java)
-	ContextCompat.startForegroundService(this, serviceIntent)
-		
+
 	/*	debug test:
 	fun testHardwareDelegates()
 	{
@@ -85,6 +84,23 @@ class ChooserActivity :
 			Log.e(tag, "❌ Неизвестная критическая ошибка GPU: ${e.message}")
 		}
 	} */
+	
+		
+	//	запуск сервиса/сервера при старте приложения:
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+	{
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+			// Запрашиваем разрешение у пользователя
+			ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+		}
+		else startMlServer()
+	}
+	else startMlServer()
+	private fun startMlServer()
+	{
+		val serviceIntent = Intent(this, MlKitServerService::class.java)
+		ContextCompat.startForegroundService(this, serviceIntent)
+	}
 
 	//	Logs Btn:
 	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
