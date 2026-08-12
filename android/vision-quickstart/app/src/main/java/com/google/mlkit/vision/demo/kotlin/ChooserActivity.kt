@@ -96,7 +96,7 @@ class ChooserActivity :
 		else startMlServer()
 	}
 	else startMlServer()
-	private fun startMlServer()
+	fun startMlServer()
 	{
 		val serviceIntent = Intent(this, MlKitServerService::class.java)
 		ContextCompat.startForegroundService(this, serviceIntent)
