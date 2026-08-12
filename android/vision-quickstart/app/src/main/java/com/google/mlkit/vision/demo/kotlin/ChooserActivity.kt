@@ -85,27 +85,27 @@ class ChooserActivity :
 		}
 	} */
 	
-		
-	//	запуск сервиса/сервера при старте приложения:
+		//	запуск сервиса/сервера при старте приложения:
 	fun startMlServer()
 	{
 		val serviceIntent = Intent(this, MlKitServerService::class.java)
 		ContextCompat.startForegroundService(this, serviceIntent)
 	}
-	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-	{
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-			// Запрашиваем разрешение у пользователя
-			ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
-		}
-		else startMlServer()
-	}
-	else startMlServer()
 
 	//	Logs Btn:
 	findViewById<Button>(R.id.btn_show_logs).setOnClickListener {    
 		try {
 			//testHardwareDelegates()
+			
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+			{
+				if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+					// Запрашиваем разрешение у пользователя
+					ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+				}
+				else startMlServer()
+			}
+			else startMlServer()
 			
 			// Получаем логи
 			val logs = Runtime.getRuntime().exec("logcat -d -t 1000").inputStream.bufferedReader().readText()
